@@ -34,7 +34,7 @@ class NestedSubBuilder extends Builder
         return $this->level;
     }
 
-    public function getChildComponents(): array
+    public function getDefaultChildComponents(): array
     {
         if (! $this->childComponents) {
             $this->childComponents(
