@@ -35,7 +35,7 @@ class NestedBuilder extends NestedSubBuilder
         return [];
     }
 
-    public function nestedConfiguration(Closure $nestedConfiguration = null): static
+    public function nestedConfiguration(?Closure $nestedConfiguration = null): static
     {
         $this->nestedConfiguration = $nestedConfiguration;
 

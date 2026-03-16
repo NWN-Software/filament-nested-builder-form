@@ -3,6 +3,7 @@
 namespace Thiktak\FilamentNestedBuilderForm\Forms\Components;
 
 use Filament\Forms\Components\Builder;
+use Filament\Schemas\Schema;
 
 class NestedSubBuilder extends Builder
 {
@@ -34,28 +35,22 @@ class NestedSubBuilder extends Builder
         return $this->level;
     }
 
-    public function getDefaultChildComponents(): array
+    public function getDefaultChildComponents(): array|Schema
     {
-        if (! $this->childComponents) {
-            $this->childComponents(
-                (array) $this->evaluate(
-                    $this->getNestedBuilder()->getNestedNamedChildComponents(),
-                    [
-                        'builder' => $this,
-                        'parent' => $this->getNestedBuilder(),
-                    ]
-                )
+        if (empty($this->childComponents['default'] ?? null)) {
+            $this->childComponents['default'] = (array) $this->evaluate(
+                $this->getNestedBuilder()->getNestedNamedChildComponents(),
+                [
+                    'builder' => $this,
+                    'parent' => $this->getNestedBuilder(),
+                ]
             );
         }
 
-        if ($this->childComponents) {
-            return parent::getChildComponents();
-        }
-
-        return [];
+        return parent::getDefaultChildComponents();
     }
 
-    public function importNestedBlocks($make, string $name = null): Builder
+    public function importNestedBlocks($make, ?string $name = null): Builder
     {
         $nestedComponents = $this->getNestedBuilder()->getNestedNamedChildComponents($name ?: 'default');
 
@@ -63,12 +58,9 @@ class NestedSubBuilder extends Builder
             ->nestedBuilder($this->getNestedBuilder())
             ->level($this->getLevel() + 1);
 
-        // Call nestedConfiguration for each block created
-        // -> Use $builder->getLevel() to know where you are
         $this->getNestedBuilder()
             ->getNestedConfiguration($builder);
 
-        // Add schema
         $builder = $builder
             ->schema(fn () => $this->evaluate(
                 $nestedComponents,
